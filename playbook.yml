@@ -1,0 +1,71 @@
+- name: Install and start projects
+  hosts: all
+
+  tasks:
+    - name: add mongo ppa key
+      sudo: yes
+      apt_key: >
+        keyserver=hkp://keyserver.ubuntu.com:80
+        id=EA312927
+        state=present
+
+    - name: add mongo sources list
+      sudo: yes
+      apt_repository: repo='deb http://repo.mongodb.org/apt/ubuntu trusty/mongodb-org/3.2 multiverse' state=present
+
+    - name: Install mongo
+      sudo: yes
+      apt: name=mongodb state=latest update_cache=yes
+
+    - name: install RabbitMq
+      sudo: yes
+      apt: name=rabbitmq-server
+
+    - name: Get Node Version Manager installation script
+      get_url: url=https://raw.githubusercontent.com/creationix/nvm/v0.31.1/install.sh dest=~/install-nvm.sh mode=0554
+
+    - name: install NVM
+      shell: >
+        ~/install-nvm.sh
+        creates=/home/ubuntu/.nvm
+      args:
+        executable: /bin/bash
+
+    - name: install Node.js
+      shell: >
+        /bin/bash -c "source ~/.nvm/nvm.sh && nvm install 4 && nvm alias default 4"
+        creates=/home/{{ ansible_user_id }}/.nvm/alias
+
+    - name: Install git
+      sudo: yes
+      apt: name=git
+
+    - name: Install supervisor
+      sudo: yes
+      apt: name=supervisor
+
+    - name: download trucksimulation fat-jar
+      get_url: >
+        url=https://github.com/fleetSim/trucksimulation/releases/download/v0.1.0/trucksimulation-0.1.0-fat.jar
+        dest=~/trucksimulation-fat.jar
+        mode=0554
+
+    - name: clone trucksimulation UI (master/HEAD)
+      git: >
+        repo=https://github.com/fleetSim/trucksimulation-ui.git
+        dest=~/trucksimulation-ui
+
+    - name: clone context-manager (master/HEAD)
+      git: >
+        repo=https://github.com/sitQA/context-manager.git
+        dest=~/context-manager
+
+    - name: clone quality assessment server (master/HEAD)
+      git: >
+        repo=https://github.com/sitQA/situation-quality-assessment.git
+        dest=~/situation-quality-assessment
+
+    - name: clone example client (master/HEAD)
+      git: >
+        repo=https://github.com/sitQA/exampleClient.git
+        dest=~/example-client
