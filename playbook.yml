@@ -44,28 +44,49 @@
       sudo: yes
       apt: name=supervisor
 
-    - name: download trucksimulation fat-jar
-      get_url: >
-        url=https://github.com/fleetSim/trucksimulation/releases/download/v0.1.0/trucksimulation-0.1.0-fat.jar
-        dest=~/trucksimulation-fat.jar
-        mode=0554
-
-    - name: clone trucksimulation UI (master/HEAD)
-      git: >
-        repo=https://github.com/fleetSim/trucksimulation-ui.git
-        dest=~/trucksimulation-ui
-
     - name: clone context-manager (master/HEAD)
       git: >
         repo=https://github.com/sitQA/context-manager.git
         dest=~/context-manager
+
+    - name: install Node.js packages
+      shell: >
+        /bin/bash -c "source ~/.nvm/nvm.sh && cd ~/context-manager && npm install"
+
+    - name: add supervisor conf for context-manager
+      sudo: yes
+      template: src=templates/supervisor.context-manager.conf.j2 dest=/etc/supervisor/conf.d/context-manager.conf owner=root group=root mode=0644
 
     - name: clone quality assessment server (master/HEAD)
       git: >
         repo=https://github.com/sitQA/situation-quality-assessment.git
         dest=~/situation-quality-assessment
 
+    - name: install Node.js packages
+      shell: >
+        /bin/bash -c "source ~/.nvm/nvm.sh && cd ~/situation-quality-assessment && npm install"
+
+    - name: add supervisor conf for quality assessment
+      sudo: yes
+      template: src=templates/supervisor.quality-assessment.conf.j2 dest=/etc/supervisor/conf.d/quality-assessment.conf owner=root group=root mode=0644
+
     - name: clone example client (master/HEAD)
       git: >
         repo=https://github.com/sitQA/exampleClient.git
         dest=~/example-client
+
+    - name: install Node.js packages
+      shell: >
+        /bin/bash -c "source ~/.nvm/nvm.sh && cd ~/example-client && npm install"
+
+    - name: add supervisor conf for example client
+      sudo: yes
+      template: src=templates/supervisor.sample-client.conf.j2 dest=/etc/supervisor/conf.d/sample-client.conf owner=root group=root mode=0644
+
+    - name: restart supervisor to load config
+      service: name=supervisor state=restarted
+      sudo: yes
+
+    - name: start rabbitmq
+      service: name=rabbitmq state=started
+      sudo: yes

@@ -1,0 +1,10 @@
+[program:exampleclient]
+directory=/home/{{ ansible_user_id }}/example-client
+command=/bin/bash -c "source /home/{{ ansible_user_id }}/.nvm/nvm.sh && npm start"
+autostart=true
+autorestart=true
+user={{ ansible_user_id }}
+stdout_logfile=/home/{{ ansible_user_id }}/example-client/stdout.log
+stdout_logfile_maxbytes=3MB
+stderr_logfile=/home/{{ ansible_user_id }}/example-client/stderr.log
+stderr_logfile_maxbytes=3MB

@@ -1,0 +1,9 @@
+[program:node]
+directory = /home/{{ ansible_user_id }}/trucksimulation
+command = java -jar trucksimulation-0.1.0-fat.jar -conf conf.json
+autostart=true
+autorestart=true
+stdout_logfile=/home/{{ ansible_user_id }}/trucksimulation/stdout.log
+stdout_logfile_maxbytes=3MB
+stderr_logfile=/home/{{ ansible_user_id }}/trucksimulation/stderr.log
+stderr_logfile_maxbytes=3MB
